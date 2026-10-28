@@ -25,6 +25,9 @@
 
 ## Start here
 
+> [!WARNING]
+> **Security notice for this fork:** Do not build, install, or run the project before reviewing its code, dependencies, Gradle wrappers, and Android permissions. Read the [Safe Usage Guide](SAFE_USAGE.md) first.
+
 | You have | Go to |
 |---|---|
 | **An Android TV or Google TV** | [Quick start](#quick-start): a coding assistant does the work in about fifteen minutes. |
