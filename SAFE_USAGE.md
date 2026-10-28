@@ -20,11 +20,13 @@ Review every change made after this commit before using it.
 - Review all Python and Gradle dependencies before downloading them.
 - Never build from an unreviewed branch or commit.
 
-## ADB key protection
+## ADB transport and key protection
 
-The tools use a repository-specific ADB key by default.
+Prefer a verified Google ADB executable by setting `TV_ADB_BINARY`. In this mode, the tools do not import the legacy `adb-shell`, `rsa`, or `cryptography` Python packages. Google ADB manages its own pairing and authentication data.
 
-The personal system key at `~/.android/adbkey` must not be read automatically. It is available only after explicit opt-in:
+If `TV_ADB_BINARY` is not set, the tools use the legacy Python client and a repository-specific ADB key.
+
+In legacy mode, the personal system key at `~/.android/adbkey` must not be read automatically. It is available only after explicit opt-in:
 
 `TV_USE_SYSTEM_ADB_KEY=1`
 
@@ -78,7 +80,7 @@ Dependencies must use reviewed, exact versions. Floating version ranges are not 
 
 Package hashes should be generated and reviewed in an isolated environment before installation. A version pin alone does not prove that a downloaded artifact is trustworthy.
 
-The `rsa` Python package currently used by this repository is archived upstream and should be replaced or removed after a separate compatibility review.
+The `rsa` Python package is archived upstream. It remains pinned only for the optional legacy `adb-shell` mode, whose package metadata declares it as a dependency. The preferred native Google ADB mode does not import or require it.
 
 ## Incident response
 

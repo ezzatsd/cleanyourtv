@@ -1,3 +1,5 @@
+# Legacy adb_shell mode only. Prefer verified Google ADB via TV_ADB_BINARY.
 adb-shell==0.4.4
+# adb-shell declares this archived dependency; keep it pinned while legacy mode remains.
 rsa==4.9.1
 cryptography==50.0.2

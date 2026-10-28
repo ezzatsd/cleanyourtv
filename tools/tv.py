@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Minimal ADB-over-TCP client for an Android TV using adb_shell (no adb binary needed).
+"""Minimal ADB-over-TCP client for an Android TV using Google ADB or the legacy adb_shell client.
 
 Set TV_HOST to the TV's IP (or IP:port). Usage:
     tv.py --probe                      connect and print model / Android version
@@ -16,8 +16,10 @@ Exit status: 0 the command ran (the TV's own answer is in its output), 1 the scr
 empty or failed, 2 it was refused before anything ran on the TV - a flag it does not have, a local
 path that cannot be used, a port it could not open.
 
-Set TV_ADB_BINARY to the Google adb executable to use an already connected, paired transport
-(including encrypted Wireless debugging). See tools/native-adb.md.
+Set TV_ADB_BINARY to the Google adb executable to use the preferred native transport with an
+already connected, paired device (including encrypted Wireless debugging). In this mode, the
+legacy adb_shell, rsa and cryptography Python packages are not imported or required.
+See tools/native-adb.md.
 """
 import errno
 import os
@@ -33,35 +35,44 @@ if sys.argv[1:2] and sys.argv[1] in ("-h", "--help"):
     print((__doc__ or "").strip())
     sys.exit(0)
 
-# The docs type `tools/tv.py ...`, which starts the first python3 on PATH, and that one seldom has
-# adb_shell: the README installs it into tools/venv only. Run that way, tv.py starts again under the
-# venv's Python, or says how to make the venv, instead of ending in a ModuleNotFoundError traceback.
-# Only when run as a script: recovery.py, privacy.py, bench.py and the tests import this file and
-# handle a missing client themselves.
-try:
-    from adb_shell.adb_device import AdbDeviceTcp
-    from adb_shell.auth.keygen import keygen
-    from adb_shell.auth.sign_pythonrsa import PythonRSASigner
-except ImportError as e:
-    if __name__ != "__main__":
-        raise
-    _dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "venv")
-    _venv = next((p for p in (os.path.join(_dir, "bin", "python"), os.path.join(_dir, "Scripts", "python.exe"))
-                  if os.path.isfile(p)), None)
-    # Once only, marked in the environment: a venv that lacks adb_shell as well gets the message below
-    # rather than another run of itself.
-    if _venv and not os.environ.get("CLEANYOURTV_TV_PY_VENV"):
-        os.environ["CLEANYOURTV_TV_PY_VENV"] = "1"
-        _args = [_venv, "-I", os.path.abspath(__file__), *sys.argv[1:]]
-        if os.name == "nt":
-            # No exec on Windows: os.execv starts a second process, and the shell takes its prompt back.
-            import subprocess
-            sys.exit(subprocess.call(_args))
-        os.execv(_venv, _args)
-    _make = (r"python -m venv tools\venv; tools\venv\Scripts\python.exe -m pip install -r tools\requirements.txt"
-             if os.name == "nt" else
-             "python3 -m venv tools/venv && tools/venv/bin/pip install -r tools/requirements.txt")
-    sys.exit(f"tools/tv.py needs the packages in tools/requirements.txt ({e}).\nrun: {_make}")
+_native_adb_binary = os.environ.get("TV_ADB_BINARY")
+
+# The preferred Google ADB transport does not load the legacy Python client or its cryptographic
+# dependencies. The legacy client remains available when TV_ADB_BINARY is not set.
+if not _native_adb_binary:
+    # The docs type `tools/tv.py ...`, which starts the first python3 on PATH, and that one seldom has
+    # adb_shell: the README installs it into tools/venv only. Run that way, tv.py starts again under the
+    # venv's Python, or says how to make the venv, instead of ending in a ModuleNotFoundError traceback.
+    # Only when run as a script: recovery.py, privacy.py, bench.py and the tests import this file and
+    # handle a missing client themselves.
+    try:
+        from adb_shell.adb_device import AdbDeviceTcp
+        from adb_shell.auth.keygen import keygen
+        from adb_shell.auth.sign_cryptography import CryptographySigner
+    except ImportError as e:
+        if __name__ != "__main__":
+            raise
+        _dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "venv")
+        _venv = next((p for p in (os.path.join(_dir, "bin", "python"), os.path.join(_dir, "Scripts", "python.exe"))
+                      if os.path.isfile(p)), None)
+        # Once only, marked in the environment: a venv that lacks adb_shell as well gets the message below
+        # rather than another run of itself.
+        if _venv and not os.environ.get("CLEANYOURTV_TV_PY_VENV"):
+            os.environ["CLEANYOURTV_TV_PY_VENV"] = "1"
+            _args = [_venv, "-I", os.path.abspath(__file__), *sys.argv[1:]]
+            if os.name == "nt":
+                # No exec on Windows: os.execv starts a second process, and the shell takes its prompt back.
+                import subprocess
+                sys.exit(subprocess.call(_args))
+            os.execv(_venv, _args)
+        _make = (r"python -m venv tools\venv; tools\venv\Scripts\python.exe -m pip install -r tools\requirements.txt"
+                 if os.name == "nt" else
+                 "python3 -m venv tools/venv && tools/venv/bin/pip install -r tools/requirements.txt")
+        sys.exit(
+            f"Legacy adb_shell mode needs the packages in tools/requirements.txt ({e}).\n"
+            f"run: {_make}\n"
+            "Preferred native mode: set TV_ADB_BINARY to the verified Google adb executable."
+        )
 
 # Windows consoles often use an old code page (cp1251, cp1252 and others) that cannot print every character
 # in dumpsys output. Python then stops with an error in the middle. disable.ps1 reads this output to see if
@@ -141,11 +152,7 @@ def get_signer():
             os.umask(old_umask)
     if KEY != ADB_KEY:   # the stock key belongs to the user's own adb; don't touch its permissions
         restrict(KEY)
-    with open(KEY) as f:
-        priv = f.read()
-    with open(KEY + ".pub") as f:
-        pub = f.read()
-    return PythonRSASigner(pub, priv)
+    return CryptographySigner(KEY)
 
 
 def stock_signer():
@@ -160,11 +167,7 @@ def stock_signer():
     if not USE_SYSTEM_ADB_KEY or KEY == ADB_KEY or not (os.path.exists(ADB_KEY) and os.path.exists(ADB_KEY + ".pub")):
         return None
     try:
-        with open(ADB_KEY) as f:
-            priv = f.read()
-        with open(ADB_KEY + ".pub") as f:
-            pub = f.read()
-        return PythonRSASigner(pub, priv)
+        return CryptographySigner(ADB_KEY)
     except Exception:   # unreadable (a `sudo adb` run can leave it root's), or not a key adb_shell parses
         return None
 
@@ -227,9 +230,8 @@ class NativeAdbDevice:
 
 
 def connect(timeout=120):
-    binary = os.environ.get("TV_ADB_BINARY")
-    if binary:
-        return NativeAdbDevice(binary, HOST, PORT, timeout)
+    if _native_adb_binary:
+        return NativeAdbDevice(_native_adb_binary, HOST, PORT, timeout)
     dev = AdbDeviceTcp(HOST, PORT, default_transport_timeout_s=float(timeout))
     keys = [get_signer()]   # first, so the prompt asks for the same key as before
     stock = stock_signer()
