@@ -102,9 +102,9 @@ except ValueError:
     sys.exit(f"not a port number: {_port_str!r}")
 KEYDIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "adbkey")
 KEY = os.path.join(KEYDIR, "adbkey")
-# Reuse the stock adb key when the TV already trusts it (platform-tools / Android Studio users), so the
-# "Allow USB debugging?" prompt doesn't come back a second time for this client. From #105. While
-# tools/adbkey has no key, the stock key is the only one; once it has one, connect() offers both.
+# Reuse the stock ADB key only when explicitly enabled with TV_USE_SYSTEM_ADB_KEY=1.
+# This prevents the script from reading ~/.android/adbkey without the user's consent.
+# When enabled, the existing key can avoid an additional authorization prompt on the TV.
 ADB_KEY = os.path.join(os.path.expanduser("~"), ".android", "adbkey")
 USE_SYSTEM_ADB_KEY = os.environ.get("TV_USE_SYSTEM_ADB_KEY") == "1"
 if USE_SYSTEM_ADB_KEY and not os.path.exists(KEY) and os.path.exists(ADB_KEY) and os.path.exists(ADB_KEY + ".pub"):
@@ -149,7 +149,7 @@ def get_signer():
 
 
 def stock_signer():
-    """The stock ~/.android/adbkey, to offer after tools/adbkey's key, or None.
+    """Return the stock ~/.android/adbkey signer only after explicit opt-in, or None.
 
     A tools/adbkey made before the TV approved the stock adb key kept a set that trusts that key
     `unauthorized` until the folder was deleted (#1526). adb_shell signs the TV's token with each key in
