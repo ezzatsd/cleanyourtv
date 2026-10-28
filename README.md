@@ -159,15 +159,18 @@ person with your model skips that step: [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Doing it by hand
 
-Everything the assistant does, you can run yourself. The tools need Python 3 and nothing else.
-`tools/tv.py` talks to network ADB on port 5555. If that port stays closed and the TV offers
-Wireless debugging with a pairing code (the Chromecast with Google TV and the Google TV Streamer
-do), pair it once with the stock `adb` and run `adb tcpip 5555` first, as
-[Troubleshooting](docs/TROUBLESHOOTING.md#connecting) describes.
+Everything the assistant does, you can run yourself. For the reviewed path, use Python 3 and a
+verified copy of Google's Android SDK Platform-Tools. Pair and connect with Google ADB first, then
+give the tools its absolute path. This keeps the archived legacy Python ADB dependency out of the
+normal installation path. Read the [pre-install security checklist](PRE_INSTALL_SECURITY.md) before
+building or changing a TV.
 
 ```bash
-python3 -m venv tools/venv && tools/venv/bin/pip install -r tools/requirements.txt
-export TV_HOST=192.168.1.50                                   # your TV's IP address
+adb pair 192.168.1.50:<pairing-port>
+adb connect 192.168.1.50:<connection-port>
+python3 -m venv tools/venv                                   # no package installation required
+export TV_ADB_BINARY=/absolute/path/to/verified/adb
+export TV_HOST=192.168.1.50:<connection-port>
 
 tools/venv/bin/python -I tools/tv.py --probe                 # model, Android version, firmware
 tools/venv/bin/python -I tools/tv.py 'pm list packages'      # one shell command on the TV
@@ -180,7 +183,7 @@ tools/theme.sh themes/aurora                                 # push a theme; --r
 
 | Tool | What it does |
 |---|---|
-| [`tools/tv.py`](tools/tv.py) | Pure-Python ADB client: shell, batch, push, pull, reboot, and screenshots, optionally pressing remote keys first. Works where the stock `adb` binary is blocked. Optional [paired Google ADB backend](tools/native-adb.md) for encrypted Wireless debugging. |
+| [`tools/tv.py`](tools/tv.py) | ADB helper for shell, batch, push, pull, reboot and screenshots. The reviewed path uses a [verified Google ADB backend](tools/native-adb.md); the legacy Python backend is compatibility-only. |
 | [`tools/b64push.py`](tools/b64push.py) | Uploads large files such as APKs in base64 chunks and verifies the checksum. |
 | [`tools/relay.py`](tools/relay.py) | Forwards a local port to the TV's ADB port, for assistants whose sandbox can't reach your network. Listens on this computer only. [Guide](tools/relay.md). |
 | [`tools/disable.sh`](tools/disable.sh), [`restore.sh`](tools/restore.sh) | Apply or undo a debloat list, the undo from the state recorded before the change. |
