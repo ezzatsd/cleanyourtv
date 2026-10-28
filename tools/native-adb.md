@@ -30,8 +30,15 @@ shared Google ADB connection and server running, so other tools keep working.
 
 The setting is inherited by `tools/disable.sh`, `tools/restore.sh`,
 `tools/privacy.py`, `tools/theme.sh`, and `launcher/build-and-install.sh`;
-their existing safety checks still run. Back up first and follow `PROMPT.md`
-before changing a TV. For example:
+their existing safety checks still run. Some shell wrappers still expect a Python
+interpreter at `tools/venv`. For native mode, an empty virtual environment is
+sufficient; do not install `tools/requirements.txt`:
+
+```bash
+python3 -m venv tools/venv
+```
+
+Back up first and follow `PROMPT.md` before changing a TV. For example:
 
 ```bash
 python3 -I tools/tv.py --screenshot shots/before.png
