@@ -106,7 +106,8 @@ KEY = os.path.join(KEYDIR, "adbkey")
 # "Allow USB debugging?" prompt doesn't come back a second time for this client. From #105. While
 # tools/adbkey has no key, the stock key is the only one; once it has one, connect() offers both.
 ADB_KEY = os.path.join(os.path.expanduser("~"), ".android", "adbkey")
-if not os.path.exists(KEY) and os.path.exists(ADB_KEY) and os.path.exists(ADB_KEY + ".pub"):
+USE_SYSTEM_ADB_KEY = os.environ.get("TV_USE_SYSTEM_ADB_KEY") == "1"
+if USE_SYSTEM_ADB_KEY and not os.path.exists(KEY) and os.path.exists(ADB_KEY) and os.path.exists(ADB_KEY + ".pub"):
     KEY = ADB_KEY
 
 
@@ -156,7 +157,7 @@ def stock_signer():
     debugging?" prompt) only when the TV accepts none. So a second key adds no prompt, and the prompt
     still asks for tools/adbkey's key. The stock key is only read, never chmod-ed, and one that cannot
     be read or parsed is left out rather than stopping a connection tools/adbkey's key can make."""
-    if KEY == ADB_KEY or not (os.path.exists(ADB_KEY) and os.path.exists(ADB_KEY + ".pub")):
+    if not USE_SYSTEM_ADB_KEY or KEY == ADB_KEY or not (os.path.exists(ADB_KEY) and os.path.exists(ADB_KEY + ".pub")):
         return None
     try:
         with open(ADB_KEY) as f:
