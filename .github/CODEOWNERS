@@ -1,0 +1,9 @@
+# Security-sensitive paths require review by the fork owner.
+/.github/ @ezzatsd
+/tools/ @ezzatsd
+/launcher/build-and-install.sh @ezzatsd
+/addons/*/install.sh @ezzatsd
+/addons/*/build-and-install.sh @ezzatsd
+/SAFE_USAGE.md @ezzatsd
+/PRE_INSTALL_SECURITY.md @ezzatsd
+/GRADLE_WRAPPERS.sha256 @ezzatsd
