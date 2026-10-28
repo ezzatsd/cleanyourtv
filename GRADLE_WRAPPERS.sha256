@@ -1,0 +1,25 @@
+# Official Gradle 8.9 wrapper JAR checksum:
+# https://gradle.org/release-checksums/
+# Format: SHA-256  path
+498495120a03b9a6ab5d155f5de3c8f0d986a449153702fb80fc80e134484f17  addons/ad-blocking/gradle/wrapper/gradle-wrapper.jar
+498495120a03b9a6ab5d155f5de3c8f0d986a449153702fb80fc80e134484f17  addons/airplay-status/gradle/wrapper/gradle-wrapper.jar
+498495120a03b9a6ab5d155f5de3c8f0d986a449153702fb80fc80e134484f17  addons/bluetooth-connect/gradle/wrapper/gradle-wrapper.jar
+498495120a03b9a6ab5d155f5de3c8f0d986a449153702fb80fc80e134484f17  addons/bluetooth-toggle/gradle/wrapper/gradle-wrapper.jar
+498495120a03b9a6ab5d155f5de3c8f0d986a449153702fb80fc80e134484f17  addons/brightness/gradle/wrapper/gradle-wrapper.jar
+498495120a03b9a6ab5d155f5de3c8f0d986a449153702fb80fc80e134484f17  addons/digital-rain/gradle/wrapper/gradle-wrapper.jar
+498495120a03b9a6ab5d155f5de3c8f0d986a449153702fb80fc80e134484f17  addons/frigate-glance/gradle/wrapper/gradle-wrapper.jar
+498495120a03b9a6ab5d155f5de3c8f0d986a449153702fb80fc80e134484f17  addons/game-day/gradle/wrapper/gradle-wrapper.jar
+498495120a03b9a6ab5d155f5de3c8f0d986a449153702fb80fc80e134484f17  addons/headphones/gradle/wrapper/gradle-wrapper.jar
+498495120a03b9a6ab5d155f5de3c8f0d986a449153702fb80fc80e134484f17  addons/jewish-calendar/gradle/wrapper/gradle-wrapper.jar
+498495120a03b9a6ab5d155f5de3c8f0d986a449153702fb80fc80e134484f17  addons/nepali-calendar/gradle/wrapper/gradle-wrapper.jar
+498495120a03b9a6ab5d155f5de3c8f0d986a449153702fb80fc80e134484f17  addons/photo-prints/gradle/wrapper/gradle-wrapper.jar
+498495120a03b9a6ab5d155f5de3c8f0d986a449153702fb80fc80e134484f17  addons/prayer-times/gradle/wrapper/gradle-wrapper.jar
+498495120a03b9a6ab5d155f5de3c8f0d986a449153702fb80fc80e134484f17  addons/quiet-hours/gradle/wrapper/gradle-wrapper.jar
+498495120a03b9a6ab5d155f5de3c8f0d986a449153702fb80fc80e134484f17  addons/remote-access/gradle/wrapper/gradle-wrapper.jar
+498495120a03b9a6ab5d155f5de3c8f0d986a449153702fb80fc80e134484f17  addons/smart-home/gradle/wrapper/gradle-wrapper.jar
+498495120a03b9a6ab5d155f5de3c8f0d986a449153702fb80fc80e134484f17  addons/sources/gradle/wrapper/gradle-wrapper.jar
+498495120a03b9a6ab5d155f5de3c8f0d986a449153702fb80fc80e134484f17  addons/startup-branding/gradle/wrapper/gradle-wrapper.jar
+498495120a03b9a6ab5d155f5de3c8f0d986a449153702fb80fc80e134484f17  addons/tv-hub/gradle/wrapper/gradle-wrapper.jar
+498495120a03b9a6ab5d155f5de3c8f0d986a449153702fb80fc80e134484f17  addons/weather/gradle/wrapper/gradle-wrapper.jar
+498495120a03b9a6ab5d155f5de3c8f0d986a449153702fb80fc80e134484f17  addons/world-clock/gradle/wrapper/gradle-wrapper.jar
+498495120a03b9a6ab5d155f5de3c8f0d986a449153702fb80fc80e134484f17  launcher/gradle/wrapper/gradle-wrapper.jar
